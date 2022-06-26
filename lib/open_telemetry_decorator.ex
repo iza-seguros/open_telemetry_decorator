@@ -50,7 +50,7 @@ defmodule OpenTelemetryDecorator do
         span_ctx = OpenTelemetry.Tracer.current_span_ctx()
         {:span_ctx, trace_id, span_id, _, _, _, _, _, _} = span_ctx
         result = unquote(body)
-        Logger.metadata(dd: [span_id: span_id, trace_id: trace_id])
+        add_metadata_from_list(:dd, [span_id: span_id, trace_id: trace_id])
 
         included_attrs = Attributes.get(Kernel.binding(), unquote(include), result)
 
@@ -63,5 +63,36 @@ defmodule OpenTelemetryDecorator do
     e in ArgumentError ->
       target = "#{inspect(context.module)}.#{context.name}/#{context.arity} @decorate telemetry"
       reraise %ArgumentError{message: "#{target} #{e.message}"}, __STACKTRACE__
+  end
+
+  @doc """
+  Add a new key in Logger metadata or update it
+  """
+  def add_metadata(module_key, key, data) do
+    module_metadata =
+      Logger.metadata()
+      |> Keyword.get(module_key, %{})
+      |> Map.put(key, data)
+
+    update_metadata(module_key, module_metadata)
+  end
+
+  def add_metadata_from_list(module_key, metadata) when is_list(metadata) do
+    current_metadata = Logger.metadata() |> Keyword.get(module_key, %{})
+
+    module_metadata =
+      Enum.reduce(metadata, current_metadata, fn {key, data}, acc ->
+        Map.put(acc, key, data)
+      end)
+
+    update_metadata(module_key, module_metadata)
+  end
+
+  def add_metadata_from_list(_, _), do: nil
+
+  defp update_metadata(key, metadata) do
+    Keyword.new()
+    |> Keyword.put(key, metadata)
+    |> Logger.metadata()
   end
 end
