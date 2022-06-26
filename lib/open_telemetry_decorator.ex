@@ -10,6 +10,7 @@ defmodule OpenTelemetryDecorator do
              |> (&Regex.replace(~R{\(\#\K(?=[a-z][a-z0-9-]+\))}, &1, "module-")).()
 
   use Decorator.Define, trace: 1, trace: 2
+  require Logger
 
   @doc """
   Decorate a function to add an OpenTelemetry trace with a named span.
@@ -47,6 +48,7 @@ defmodule OpenTelemetryDecorator do
         span_ctx = OpenTelemetry.Tracer.current_span_ctx()
         |> IO.inspect()
         result = unquote(body)
+        Logger.metadata({"dd.span_id", span_ctx})
 
         included_attrs = Attributes.get(Kernel.binding(), unquote(include), result)
 
