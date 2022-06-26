@@ -44,7 +44,7 @@ defmodule OpenTelemetryDecorator do
       require OpenTelemetry.Span
       require OpenTelemetry.Tracer
 
-      OpenTelemetry.Tracer.update_name(service)
+      OpenTelemetry.Tracer.update_name(unquote(service))
 
       OpenTelemetry.Tracer.with_span unquote(span_name) do
         span_ctx = OpenTelemetry.Tracer.current_span_ctx()
