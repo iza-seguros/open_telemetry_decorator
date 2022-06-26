@@ -35,8 +35,8 @@ defmodule OpenTelemetryDecorator do
   """
   def trace(span_name, opts \\ [], body, context) do
     include = Keyword.get(opts, :include, [])
-    service = Keyword.get(ops, :service)
-    type = Keyword.get(ops, :type)
+    service = Keyword.get(opts, :service)
+    type = Keyword.get(opts, :type)
     Validator.validate_args(span_name, include)
 
     quote location: :keep do
