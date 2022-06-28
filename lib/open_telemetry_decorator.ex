@@ -49,7 +49,7 @@ defmodule OpenTelemetryDecorator do
       OpenTelemetry.Tracer.with_span unquote(span_name) do
         span_ctx = OpenTelemetry.Tracer.current_span_ctx()
         {:span_ctx, trace_id, span_id, _, _, _, _, _, _} = span_ctx
-        trace_id = Base.encode32("#{trace_id}", case: :lower, padding: false)
+        <<trace_id :: integer-unsigned-64>> = <<trace_id :: integer-unsigned-128>>
         span_id = Base.encode16("#{span_id}", case: :lower)
 
         result = unquote(body)
