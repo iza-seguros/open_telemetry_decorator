@@ -50,8 +50,7 @@ defmodule OpenTelemetryDecorator do
         span_ctx = OpenTelemetry.Tracer.current_span_ctx()
         {:span_ctx, trace_id, span_id, _, _, _, _, _, _} = span_ctx
         <<trace_id :: integer-unsigned-64>> = <<trace_id :: integer-unsigned-128>>
-        span_id = Base.encode16("#{span_id}", case: :lower)
-
+        IO.inspect(trace_id)
         result = unquote(body)
         Logger.metadata(span_id: span_id, trace_id: trace_id)
 
