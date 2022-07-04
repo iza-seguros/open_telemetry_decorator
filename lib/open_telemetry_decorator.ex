@@ -49,7 +49,8 @@ defmodule OpenTelemetryDecorator do
       OpenTelemetry.Tracer.with_span unquote(span_name) do
         span_ctx = OpenTelemetry.Tracer.current_span_ctx()
         result = unquote(body)
-        IO.inspect(span_ctx)
+        {:span_ctx, trace_id, span_id, _, _, _, _, _, _} = span_ctx
+        Logger.metadata(trace_id: trace_id, span_id: span_id)
         included_attrs = Attributes.get(Kernel.binding(), unquote(include), result)
 
         OpenTelemetry.Span.set_attributes(span_ctx, included_attrs)
